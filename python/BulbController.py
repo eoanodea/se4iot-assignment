@@ -1,3 +1,5 @@
+import asyncio
+
 from pywizlight import wizlight, PilotBuilder, discovery
 from typing import Any
 import json
@@ -18,32 +20,39 @@ class BulbController:
         self._client.connect(BROKER_ADDRESS)
         self._client.subscribe("house/bulbs")
         self._client.on_message = self.on_message
-        # self._client.publish("house/main-light", "OFF")
+
         self._client.loop_start()
+        self._client.publish("house/status", "READY")
+
+    def init_bulb_status(self):
+        self.publish_status()
 
     def on_message(self, client, userdata, message):
         print("MESSAGE")
-        parsedJson = json.loads(message.payload)
-        print(parsedJson)
-        if parsedJson["command"] == "status":
-            self.publish_status()
+        parsed_json = json.loads(message.payload)
+        print(parsed_json)
+        if parsed_json["command"] == "status":
+            asyncio.run(self.publish_status())
 
     async def publish_status(self):
         bulbs = await self.discover_bulbs()
-        for index, bulb in enumerate(bulbs):
-            self._client.publish("house/bulb" + index, "OFF")
+        if len(bulbs) == 0:
+            self._client.publish("house/status", "No bulbs found")
+        else:
+            for index, bulb in enumerate(bulbs):
+                self._client.publish("house/bulb" + index, "OFF")
 
     async def discover_bulbs(self):
         bulbs = await discovery.discover_lights(broadcast_space=self._broadcast_space)
-        print("yes")
-        for bulb in bulbs:
-            print(bulb.__dict__)
+
+        # for bulb in bulbs:
+        #     print(bulb.__dict__)
 
         return bulbs
 
     async def turn_on_bulb(self, ip_address):
         light = wizlight(ip_address)
-        print("light")
+
         try:
             await light.turn_on(PilotBuilder(brightness=255, warm_white=255))
             return True;
@@ -58,7 +67,7 @@ class BulbController:
             return True;
         except Exception as err:
             print("Error turning off bulb" + err)
-            return False;
+            return False
 
 
 class Bulb:
