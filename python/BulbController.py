@@ -1,12 +1,15 @@
 import asyncio
+import signal
 
 from pywizlight import wizlight, PilotBuilder, discovery
 from typing import Any
 import json
 import paho.mqtt.client as mqtt
+import sys
 
 BROKER_ADDRESS = "localhost"
 
+lambda num: print("yeehaw")
 
 class BulbController:
     _broadcast_space: str
@@ -23,6 +26,9 @@ class BulbController:
 
         self._client.loop_start()
         self._client.publish("house/status", "READY")
+
+    def get_client(self):
+        return self._client
 
     def init_bulb_status(self):
         self.publish_status()
