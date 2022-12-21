@@ -1,0 +1,16 @@
+version: "3"
+services:
+  python:
+    image: python:3.9-alpine
+    working_dir: /app
+    command: python main.py
+    volumes:
+      - ./app:/app
+    ports:
+      - "5000:5000"
+
+  mqtt:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"

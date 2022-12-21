@@ -34,9 +34,8 @@ class BulbController:
         self.publish_status()
 
     def on_message(self, client, userdata, message):
-        print("MESSAGE")
         parsed_json = json.loads(message.payload)
-        print(parsed_json)
+
         if parsed_json["command"] == "status":
             asyncio.run(self.publish_status())
 
@@ -50,10 +49,11 @@ class BulbController:
 
     async def discover_bulbs(self):
         bulbs = await discovery.discover_lights(broadcast_space=self._broadcast_space)
-
-        # for bulb in bulbs:
-        #     print(bulb.__dict__)
-
+        # print(bulbs)
+        for bulb in bulbs:
+            print(json.dumps(bulb.__dict__))
+            # print(bulb.__dict__)
+        #
         return bulbs
 
     async def turn_on_bulb(self, ip_address):
