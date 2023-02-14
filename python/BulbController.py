@@ -1,30 +1,29 @@
 import asyncio
-import signal
+import json
+import os
+import paho.mqtt.client as mqtt
 
 from pywizlight import wizlight, PilotBuilder, discovery
 from typing import Any
-import json
-import paho.mqtt.client as mqtt
-import sys
-
-BROKER_ADDRESS = "localhost"
-
-lambda num: print("yeehaw")
 
 class BulbController:
     _broadcast_space: str
+    broadcast_address: str
     _client: Any
 
-    def __init__(self, broadcast_space) -> None:
+    def __init__(self, broadcast_space, broadcast_address) -> None:
         super().__init__()
         self._broadcast_space = broadcast_space
+        self._broadcast_address = broadcast_address
 
         self._client = mqtt.Client("BulbController")
-        self._client.connect(BROKER_ADDRESS)
+        self._client.connect(broadcast_address, 1883, 60)
+        # self._client.connect(BROKER_ADDRESS)
         self._client.subscribe("house/bulbs")
         self._client.on_message = self.on_message
 
         self._client.loop_start()
+        print("Ready")
         self._client.publish("house/status", "READY")
 
     def get_client(self):

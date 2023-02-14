@@ -1,8 +1,9 @@
 from BulbController import BulbController
 import time
+import os
 
-
-BROADCAST_SPACE = "192.168.159.255"
+BROKER_ADDRESS = os.environ['BROKER_ADDRESS']
+BROADCAST_SPACE = os.environ['BROADCAST_SPACE']
 
 
 def exit_handler(controller):
@@ -13,7 +14,7 @@ def exit_handler(controller):
 
 
 def main():
-    controller = BulbController(BROADCAST_SPACE)
+    controller = BulbController(BROADCAST_SPACE, BROKER_ADDRESS)
     try:
         while True:
             time.sleep(0.1)

@@ -1,16 +1,26 @@
 version: "3"
 services:
   python:
-    image: python:3.9-alpine
-    working_dir: /app
-    command: python main.py
-    volumes:
-      - ./app:/app
-    ports:
-      - "5000:5000"
+    build:
+      context: python
+      dockerfile: Dockerfile
+    environment:
+      - BROKER_ADDRESS=${BROKER_ADDRESS}
+      - BROADCAST_SPACE=${BROADCAST_SPACE}
+    networks:
+      - my-network
+    depends_on:
+      - mqtt
 
   mqtt:
     image: eclipse-mosquitto
+    networks:
+      - my-network
+    volumes:
+      - ./mosquitto:/mosquitto
     ports:
-      - "1883:1883"
-      - "9001:9001"
+      - 2000:1883
+
+networks:
+  my-network:
+    driver: bridge
