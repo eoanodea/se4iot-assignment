@@ -2,8 +2,11 @@ from BulbController import BulbController
 import time
 import os
 
-BROKER_ADDRESS = os.environ['BROKER_ADDRESS']
-BROADCAST_SPACE = os.environ['BROADCAST_SPACE']
+# BROKER_ADDRESS = os.environ['BROKER_ADDRESS']
+# BROADCAST_SPACE = os.environ['BROADCAST_SPACE']
+
+BROKER_ADDRESS = "localhost"
+BROADCAST_SPACE = ""
 
 
 def exit_handler(controller):
@@ -24,9 +27,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
 
 #
 # atexit.register(exit_handler)

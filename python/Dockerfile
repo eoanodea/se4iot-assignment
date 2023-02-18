@@ -5,7 +5,7 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY ./ ./
+# COPY ./ ./
 
 RUN pip install pywizlight paho-mqtt
 
