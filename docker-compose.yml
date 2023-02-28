@@ -30,7 +30,6 @@ services:
       - my-network
     depends_on:
       - mqtt
-
   mqtt:
     image: eclipse-mosquitto
     networks:
@@ -39,7 +38,6 @@ services:
       - ./mosquitto:/mosquitto
     ports:
       - 2000:1883
-
   influxdb:
     image: influxdb
     networks:
@@ -54,9 +52,29 @@ services:
       - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_ADMIN_PASSWORD}
       - INFLUXDB_USER=${INFLUXDB_USER}
       - INFLUXDB_USER_PASSWORD=${INFLUXDB_USER_PASSWORD}
-
+  nodejs:
+    build:
+      context: nodejs
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nodejs:/app
+    environment:
+      - BROKER_ADDRESS=${BROKER_ADDRESS}
+      - BROKER_PORT=${BROKER_PORT}
+      - INFLUXDB_URL=${INFLUXDB_URL}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
+      - INFLUXDB_ORG=${INFLUXDB_ORG}
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
+    networks:
+      - my-network
+    depends_on:
+      - influxdb
+      - mqtt
 volumes:
   influxdb_data:
+  node_red_data:
 
 networks:
   my-network:
