@@ -13,16 +13,15 @@ class BulbController:
     _client: Any
     _bulbs: list
 
-    def __init__(self, broadcast_space, broadcast_address) -> None:
+    def __init__(self, broadcast_space, broker_address, broker_port) -> None:
         super().__init__()
         self._bulbs = []
         self._broadcast_space = broadcast_space
-        self._broadcast_address = broadcast_address
-
+        print('here is port', broker_port)
         self._client = mqtt.Client("BulbController")
-        self._client.connect(broadcast_address, 1883, 60)
+        self._client.connect(broker_address, int(broker_port), 60)
 
-        self._client.subscribe("house/bulbs")
+        self._client.subscribe("house/command")
         self._client.on_message = self.on_message
 
         self._client.loop_start()
@@ -36,16 +35,29 @@ class BulbController:
         self.publish_status()
 
     def on_message(self, client, userdata, message):
-        self._client.publish("house/status", "HEY")
+        self._client.publish("house/status", "BUSY")
+
         try:
             parsed_json = json.loads(message.payload)
             print(parsed_json)
+
+            if parsed_json is not None and 'command' in parsed_json:
+                if parsed_json['command'] == 'STATUS':
+                    asyncio.run(self.publish_status())
+                elif parsed_json['command'] == 'ON' or parsed_json['command'] == 'OFF':
+                    if 'ID' in parsed_json:
+                        asyncio.run(self.update_bulb_state(parsed_json['ID'], parsed_json['command']))
+                    else:
+                        raise Exception("Command must include an ID for the bulb")
+                else:
+                    raise Exception("Not a valid command. Please provide a message in JSON format e.g. {\"command\": "
+                                    "\"STATUS\"}")
+
         except Exception as err:
             print("could not read message")
             print(err)
-
-        if parsed_json is not None and 'command' in parsed_json:
-            asyncio.run(self.publish_status())
+            self._client.publish("house/status", "READY")
+            self._client.publish("house/message", err.__str__())
 
     async def publish_status(self):
         self._client.publish("house/status", "BUSY")
@@ -53,13 +65,36 @@ class BulbController:
         bulbs = await self.discover_bulbs()
         if len(bulbs) == 0:
             self._client.publish("house/status", "READY")
-            self._client.publish("house/bulbs/info", "No bulbs found")
+            self._client.publish("house/message", "No bulbs found")
         else:
             for index, bulb in enumerate(bulbs):
-                self._bulbs.append(Bulb(index, bulb['ip']))
-                self._client.publish("house/bulb/" + str(index), "OFF")
+                new_bulb = Bulb(index, bulb['ip'])
+                self._bulbs.append(new_bulb)
+
+                json_data = new_bulb.build_data()
+                self._client.publish("house/bulb/" + str(index), json_data)
             else:
                 self._client.publish("house/status", "READY")
+
+    async def update_bulb_state(self, index, state):
+
+        try:
+            bulb = self._bulbs[index]
+
+            if state == "ON":
+                config = PilotBuilder(brightness=255, warm_white=255)
+                await bulb.turn_on(config)
+            else:
+                await bulb.turn_off()
+
+            json_data = bulb.build_data()
+            self._client.publish("house/bulb/" + str(index), json_data)
+
+        except Exception as err:
+            print("could not update bulb state")
+            print(err)
+            self._client.publish("house/status", "READY")
+            self._client.publish("house/message", err.__str__())
 
     async def discover_bulbs(self):
         # bulbs = await discovery.discover_lights(broadcast_space=self._broadcast_space)

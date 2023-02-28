@@ -5,7 +5,9 @@ services:
       context: python
       dockerfile: Dockerfile
     environment:
+      - APP_ENV=${APP_ENV}
       - BROKER_ADDRESS=${BROKER_ADDRESS}
+      - BROKER_PORT=${BROKER_PORT}
       - BROADCAST_SPACE=${BROADCAST_SPACE}
     volumes:
       - ./python:/app
