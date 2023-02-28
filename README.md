@@ -4,7 +4,7 @@
 
 Coming soon :))
 
-### ✉️ Available commands
+## ✉️ Available commands
 
 A list of available commands that you can send through MQTT to the Bulb Controller
 | Topic | JSON Data | Description |
