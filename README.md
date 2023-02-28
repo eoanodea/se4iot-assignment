@@ -18,14 +18,16 @@ A list of available commands that you can send through MQTT to the Bulb Controll
 1. Make sure you have [docker & docker-compose](https://docs.docker.com/get-docker/) installed
 2. Clone this repository to your local machine and `cd` into it
 3. Run `cp example.env .env` and fill in any new values in the new `.env` file
+   - Use `APP_ENV=development` for a simulated version of the app
+   - Use `APP_ENV=production` for a physical version of the app
 4. Run `docker-compose up` (might take a little while on your first run)
 
 ## ✅ Todo
 
 - [x] Basic communication between Python & MQTT
-- [ ] A good plan 🙃
+- [x] Bulb Controller functionality (`STATUS`, `ON`, `OFF`)
+- [x] A good plan 🙃
 - [ ] Simulated data for graph (time light is on / off, maybe usage over a day/month/year etc)
 - [ ] Dashboard to control stuff ([openhab](https://www.openhab.org/))
-- [ ] Options to add more bulbs
 - [ ] CRON server (Node.js)
 - [ ] Google Cal integration
