@@ -1,4 +1,5 @@
 const mqtt = require("mqtt");
+const cors = require("cors");
 // const Influx = require("influx");
 
 const { InfluxDB, Point } = require("@influxdata/influxdb-client");
@@ -73,11 +74,15 @@ function checkMQTTStatus() {
 }
 
 app.get("/api/status", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
   checkMQTTStatus();
   setTimeout(function () {
     res.json({ data: bulbs });
-  }, 2000);
+  }, 500);
 });
+
+// Allow requests from any origin
+app.use(cors());
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
