@@ -1,0 +1,14 @@
+osgi.wiring.package; (&(osgi.wiring.package=io.netty.buffer)(&(version>=4.1.0)(!(version>=5.0.0))))
+240; version=4.1.72
+osgi.wiring.package; (&(osgi.wiring.package=io.netty.util.internal)(&(version>=4.1.0)(!(version>=5.0.0))))
+244; version=4.1.72
+osgi.wiring.package; (&(osgi.wiring.package=io.netty.util.internal.logging)(&(version>=4.1.0)(!(version>=5.0.0))))
+244; version=4.1.72
+osgi.wiring.package; (&(osgi.wiring.package=io.netty.channel)(&(version>=4.1.0)(!(version>=5.0.0))))
+249; version=4.1.72
+osgi.wiring.package; (&(osgi.wiring.package=io.netty.util)(&(version>=4.1.0)(!(version>=5.0.0))))
+244; version=4.1.72
+osgi.ee; (&(osgi.ee=JavaSE)(version=1.6))
+0; version=[1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 9.0.0, 10.0.0, 11.0.0]
+osgi.wiring.package; (osgi.wiring.package=io.netty.handler.codec)
+241; version=4.1.72

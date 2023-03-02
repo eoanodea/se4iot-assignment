@@ -1,0 +1,15 @@
+{
+  "mqtt:topic:aad0dedfec": {
+    "class": "org.openhab.core.thing.internal.ThingStorageEntity",
+    "value": {
+      "isBridge": false,
+      "channels": [],
+      "label": "MQTT bulb",
+      "configuration": {},
+      "properties": {},
+      "UID": "mqtt:topic:aad0dedfec",
+      "thingTypeUID": "mqtt:topic",
+      "location": "house"
+    }
+  }
+}

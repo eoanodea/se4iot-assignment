@@ -1,0 +1,14 @@
+{
+  "Builb": {
+    "class": "org.openhab.core.items.ManagedItemProvider$PersistedItem",
+    "value": {
+      "groupNames": [],
+      "itemType": "String",
+      "tags": [
+        "LivingRoom"
+      ],
+      "label": "bulb",
+      "category": "lightbulb"
+    }
+  }
+}

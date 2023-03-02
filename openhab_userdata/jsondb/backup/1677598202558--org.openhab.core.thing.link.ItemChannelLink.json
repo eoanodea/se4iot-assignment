@@ -1,0 +1,20 @@
+{
+  "Builb -\u003e mqtt:topic:aad0dedfec:bulb": {
+    "class": "org.openhab.core.thing.link.ItemChannelLink",
+    "value": {
+      "channelUID": {
+        "segments": [
+          "mqtt",
+          "topic",
+          "aad0dedfec",
+          "bulb"
+        ],
+        "uid": "mqtt:topic:aad0dedfec:bulb"
+      },
+      "configuration": {
+        "properties": {}
+      },
+      "itemName": "Builb"
+    }
+  }
+}

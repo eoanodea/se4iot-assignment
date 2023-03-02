@@ -17,6 +17,10 @@ const influx = new InfluxDB({ url: influxHost, token });
 
 const writeApi = influx.getWriteApi(org, bucket);
 
+const express = require("express");
+const app = express();
+const port = process.env.NODEJS_PORT;
+
 // Connect to MQTT broker
 const client = mqtt.connect(mqttBrokerUrl);
 
@@ -33,11 +37,16 @@ client.on("connect", function () {
   });
 });
 
+let bulbs = [];
+
 // Process MQTT messages
 client.on("message", function (topic, message) {
   const value = message.toString();
   const jsonData = JSON.parse(value);
-
+  // const currentIndex = bulbs.findIndex(bulb => bulb.id == jsonData.id)
+  // if(currentIndex === -1) {
+  bulbs.push(jsonData);
+  // }
   console.log("Received MQTT message:", value);
 
   // Write data to InfluxDB
@@ -50,11 +59,26 @@ client.on("message", function (topic, message) {
 
 // Check MQTT topic every 5 minutes
 setInterval(function () {
+  checkMQTTStatus();
+}, 5 * 60 * 1000);
+// }, 3000);
+
+function checkMQTTStatus() {
   console.log("Checking MQTT topic...");
 
   // Publish MQTT message to trigger a response
   const data = { command: "STATUS" };
-
+  bulbs = [];
   client.publish("house/command", JSON.stringify(data));
-}, 5 * 60 * 1000);
-// }, 3000);
+}
+
+app.get("/api/status", (req, res) => {
+  checkMQTTStatus();
+  setTimeout(function () {
+    res.json({ data: bulbs });
+  }, 2000);
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
