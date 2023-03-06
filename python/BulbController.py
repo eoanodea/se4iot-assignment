@@ -1,10 +1,15 @@
 import asyncio
 import json
+import os
+
 import paho.mqtt.client as mqtt
 
 from Bulb import Bulb
 from pywizlight import wizlight, PilotBuilder, discovery
 from typing import Any
+
+# APP_ENV = os.environ['APP_ENV']
+APP_ENV = "production"
 
 
 class BulbController:
@@ -44,9 +49,16 @@ class BulbController:
             if parsed_json is not None and 'command' in parsed_json:
                 if parsed_json['command'] == 'STATUS':
                     asyncio.run(self.publish_status())
+
                 elif parsed_json['command'] == 'ON' or parsed_json['command'] == 'OFF':
                     if 'ID' in parsed_json:
-                        asyncio.run(self.update_bulb_state(parsed_json['ID'], parsed_json['command']))
+                        # asyncio.new_event_loop(self.update_bulb_state(parsed_json['ID'], parsed_json['command']))
+                        loop = asyncio.new_event_loop()  # create a new event loop
+                        asyncio.set_event_loop(loop)  # set the new event loop as the current event loop
+                        try:
+                            asyncio.run(self.update_bulb_state(parsed_json['ID'], parsed_json['command']))
+                        finally:
+                            loop.close()  # close the new event loop
                     else:
                         raise Exception("Command must include an ID for the bulb")
                 else:
@@ -68,7 +80,7 @@ class BulbController:
             self._client.publish("house/message", "No bulbs found")
         else:
             for index, bulb in enumerate(bulbs):
-                new_bulb = Bulb(index, bulb['ip'])
+                new_bulb = Bulb(index, bulb.__getattribute__('ip'))
                 self._bulbs.append(new_bulb)
 
                 json_data = new_bulb.build_data()
@@ -84,27 +96,30 @@ class BulbController:
             if state == "ON":
                 config = PilotBuilder(brightness=255, warm_white=255)
                 await bulb.turn_on(config)
+                json_data = bulb.build_data()
+                self._client.publish("house/bulb/" + str(index), json_data)
             else:
                 await bulb.turn_off()
 
-            json_data = bulb.build_data()
-            self._client.publish("house/bulb/" + str(index), json_data)
+            # json_data = bulb.build_data()
+            # self._client.publish("house/bulb/" + str(index), json_data)
 
         except Exception as err:
             print("could not update bulb state")
-            print(err)
+            print(err.__str__())
             self._client.publish("house/status", "READY")
             self._client.publish("house/message", err.__str__())
 
     async def discover_bulbs(self):
-        # bulbs = await discovery.discover_lights(broadcast_space=self._broadcast_space)
+        if APP_ENV == 'production':
+            bulbs = await discovery.discover_lights(broadcast_space=self._broadcast_space)
+        else:
+            file = open('mock-data.json')
+            data = json.load(file)
 
-        file = open('mock-data.json')
-        data = json.load(file)
+            print(data)
 
-        print(data)
-
-        bulbs = data
+            bulbs = data
         return bulbs
 
     # async def turn_on_bulb(self, ip_address):

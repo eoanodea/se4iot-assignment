@@ -2,9 +2,13 @@ from BulbController import BulbController
 import time
 import os
 
-BROKER_ADDRESS = os.environ['BROKER_ADDRESS']
-BROKER_PORT = os.environ['BROKER_PORT']
-BROADCAST_SPACE = os.environ['BROADCAST_SPACE']
+# BROKER_ADDRESS = os.environ['BROKER_ADDRESS']
+# BROKER_PORT = os.environ['BROKER_PORT']
+# BROADCAST_SPACE = os.environ['BROADCAST_SPACE']
+APP_ENV = "production"
+BROKER_ADDRESS = "localhost"
+BROKER_PORT = "1883"
+BROADCAST_SPACE = "192.168.159.255"
 
 
 def exit_handler(controller):

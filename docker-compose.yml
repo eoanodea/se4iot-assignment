@@ -1,24 +1,5 @@
 version: "3"
 services:
-  # openhab:
-  #   image: "openhab/openhab:3.4.2"
-  #   restart: always
-  #   networks:
-  #     - my-network
-  #   ports:
-  #     - "${OPENHAB_HTTP_PORT}:${OPENHAB_HTTP_PORT}"
-  #   volumes:
-  #     - "./openhab_addons:/openhab/addons"
-  #     - "./openhab_conf:/openhab/conf"
-  #     - "./openhab_userdata:/openhab/userdata"
-  #   environment:
-  #     CRYPTO_POLICY: "unlimited"
-  #     EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
-  #     OPENHAB_HTTP_PORT: "${OPENHAB_HTTP_PORT}"
-  #   depends_on:
-  #     - influxdb
-  #     - python
-  #     - mqtt
   sample-data:
     build:
       context: sample-data
