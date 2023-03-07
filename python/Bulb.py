@@ -5,8 +5,10 @@ from typing import Any
 from BulbEnums import BulbState
 from pywizlight import wizlight
 
-# APP_ENV = os.environ['APP_ENV']
-APP_ENV="production"
+APP_ENV = os.environ['APP_ENV']
+
+
+# APP_ENV="production"
 
 class Bulb:
     _id: int
@@ -34,20 +36,23 @@ class Bulb:
             if APP_ENV == "production":
                 await self._client.turn_on(config)
                 self._state = BulbState.ON
-                return True;
+                return True
             else:
                 self._state = BulbState.ON
-                return True;
+                return True
         except Exception as err:
             print("Error turning on bulb" + err.__str__())
-            return False;
+            return False
 
     async def turn_off(self):
         try:
             if APP_ENV == "production":
                 await self._client.turn_off()
-            self._state = BulbState.OFF
-            return True;
+                self._state = BulbState.OFF
+                return True
+            else:
+                self._state = BulbState.OFF
+                return True
         except Exception as err:
-            print("Error turning on bulb" + err)
-            return False;
+            print("Error turning off bulb" + err.__str__())
+            return False

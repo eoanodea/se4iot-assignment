@@ -1,24 +1,22 @@
-import { useEffect, useState } from "react";
-import bulbService from "../services/bulbService";
+import { Grid, Typography } from "@mui/material";
+import { IBulb } from "../interfaces";
+import Bulb from "./Bulb";
 
-const ListBulbs = () => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [bulbs, setBulbs] = useState([]);
+interface IListBulbs {
+  bulbs: IBulb[];
+}
 
-  useEffect(() => {
-    bulbService.getAll().then((res) => {
-      if (res && res.data) {
-        setBulbs(res.data);
-        setLoading(false);
-      } else {
-        setError("Error: Could not fetch data");
-      }
-    });
-  }, []);
-
-  if (loading) return <h2>loading</h2>;
-  return <>{bulbs.length}</>;
+const ListBulbs = ({ bulbs }: IListBulbs) => {
+  return (
+    <>
+      <Typography variant="h2">Available Bulbs</Typography>
+      <Grid container spacing={6}>
+        {bulbs.map((bulb, index) => (
+          <Bulb bulb={bulb} key={index} />
+        ))}
+      </Grid>
+    </>
+  );
 };
 
 export default ListBulbs;

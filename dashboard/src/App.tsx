@@ -1,5 +1,11 @@
 import React from "react";
-import { AppBar, ThemeProvider, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Grid,
+  ThemeProvider,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import theme from "./theme";
 import Home from "./pages/Home";
 
@@ -11,7 +17,16 @@ function App() {
           <Typography>Dashboard</Typography>
         </Toolbar>
       </AppBar>
-      <Home />
+      <Grid
+        container
+        component="main"
+        style={{ marginTop: "40px", marginBottom: "40px", minHeight: "60vh" }}
+        justifyContent="space-evenly"
+      >
+        <Grid item xs={11}>
+          <Home />
+        </Grid>
+      </Grid>
     </ThemeProvider>
   );
 }

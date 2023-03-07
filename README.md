@@ -27,7 +27,6 @@ A list of available commands that you can send through MQTT to the Bulb Controll
 - [x] Basic communication between Python & MQTT
 - [x] Bulb Controller functionality (`STATUS`, `ON`, `OFF`)
 - [x] A good plan 🙃
-- [ ] Simulated data for graph (time light is on / off, maybe usage over a day/month/year etc)
+- [x] Simulated data for graph (time light is on / off, maybe usage over a day/month/year etc)
 - [ ] Dashboard to control stuff ([openhab](https://www.openhab.org/))
-- [ ] CRON server (Node.js)
-- [ ] Google Cal integration
+- [x] CRON server (Node.js)

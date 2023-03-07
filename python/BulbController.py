@@ -8,8 +8,8 @@ from Bulb import Bulb
 from pywizlight import wizlight, PilotBuilder, discovery
 from typing import Any
 
-# APP_ENV = os.environ['APP_ENV']
-APP_ENV = "production"
+APP_ENV = os.environ['APP_ENV']
+# APP_ENV = "production"
 
 
 class BulbController:
@@ -32,6 +32,8 @@ class BulbController:
         self._client.loop_start()
         print("Ready")
         self._client.publish("house/status", "READY")
+        self._client.publish("house/message", "")
+        self._client.publish("house/bulbs", "")
 
     def get_client(self):
         return self._client
@@ -41,6 +43,7 @@ class BulbController:
 
     def on_message(self, client, userdata, message):
         self._client.publish("house/status", "BUSY")
+        self._client.publish("house/message", "")
 
         try:
             parsed_json = json.loads(message.payload)
@@ -80,16 +83,22 @@ class BulbController:
             self._client.publish("house/message", "No bulbs found")
         else:
             for index, bulb in enumerate(bulbs):
-                new_bulb = Bulb(index, bulb.__getattribute__('ip'))
+                if APP_ENV == 'production':
+                    ip = bulb.__getattribute__('ip')
+                else:
+                    ip = bulb['ip']
+
+                new_bulb = Bulb(index, ip)
                 self._bulbs.append(new_bulb)
 
                 json_data = new_bulb.build_data()
                 self._client.publish("house/bulb/" + str(index), json_data)
             else:
                 self._client.publish("house/status", "READY")
+                self._client.publish("house/message", "")
 
-    async def update_bulb_state(self, index, state):
-
+    async def update_bulb_state(self, i, state):
+        index = int(i)
         try:
             bulb = self._bulbs[index]
 
@@ -100,6 +109,8 @@ class BulbController:
                 self._client.publish("house/bulb/" + str(index), json_data)
             else:
                 await bulb.turn_off()
+                json_data = bulb.build_data()
+                self._client.publish("house/bulb/" + str(index), json_data)
 
             # json_data = bulb.build_data()
             # self._client.publish("house/bulb/" + str(index), json_data)

@@ -44,13 +44,9 @@ let bulbs = [];
 client.on("message", function (topic, message) {
   const value = message.toString();
   const jsonData = JSON.parse(value);
-  // const currentIndex = bulbs.findIndex(bulb => bulb.id == jsonData.id)
-  // if(currentIndex === -1) {
-  bulbs.push(jsonData);
-  // }
-  console.log("Received MQTT message:", value);
 
-  // Write data to InfluxDB
+  bulbs.push(jsonData);
+
   const point = new Point("bulb")
     .tag("bulb_ip", jsonData.ip)
     .stringField("state", jsonData.state);
@@ -73,11 +69,27 @@ function checkMQTTStatus() {
   client.publish("house/command", JSON.stringify(data));
 }
 
-app.get("/api/status", (req, res) => {
+app.get("/api/bulbs", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   checkMQTTStatus();
   setTimeout(function () {
     res.json({ data: bulbs });
+  }, 500);
+});
+
+app.patch("/api/bulbs/:id/:state", (req, res) => {
+  const { id, state } = req.params;
+  console.log("request", id, state);
+  const data = { command: state, ID: id };
+  bulbs = [];
+  console.log("data!", data);
+  client.publish("house/command", JSON.stringify(data));
+
+  // setTimeout(function () {
+  // checkMQTTStatus();
+  setTimeout(function () {
+    res.json({ data: bulbs[id] });
+    // }, 500);
   }, 500);
 });
 
