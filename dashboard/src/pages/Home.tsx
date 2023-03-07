@@ -33,20 +33,19 @@ const Home = () => {
       .updateBulb(id, state)
       .then((data) => {
         if (data) {
-          console.log("success");
-          setBulbs([...bulbs, data]);
-          // setLoading(false);
+          const newBulbs = bulbs;
+
+          const bulbIndex = newBulbs.findIndex(
+            (item) => item.ip === data[0].ip
+          );
+          newBulbs[bulbIndex] = data[0];
+          setBulbs([...newBulbs]);
         } else {
           console.log("server issue");
-
-          // setError("Error: Could not fetch data");
-          // setLoading(false);
         }
       })
       .catch((err) => {
         console.log("another issue", err);
-        // setError("Error: Could not fetch data");
-        // setLoading(false);
       });
   };
 

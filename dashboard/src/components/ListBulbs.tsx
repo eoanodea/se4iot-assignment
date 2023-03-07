@@ -12,9 +12,15 @@ const ListBulbs = ({ bulbs, updateState }: IListBulbs) => {
     <>
       <Typography variant="h2">Available Bulbs</Typography>
       <Grid container spacing={6}>
-        {bulbs.map((bulb, index) => (
-          <Bulb bulb={bulb} key={index} updateState={updateState} />
-        ))}
+        {bulbs.length > 0 ? (
+          bulbs.map((bulb, index) => (
+            <Bulb bulb={bulb} key={index} updateState={updateState} />
+          ))
+        ) : (
+          <Grid item xs={12}>
+            <Typography variant="body1">No bulbs found</Typography>
+          </Grid>
+        )}
       </Grid>
     </>
   );

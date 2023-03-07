@@ -10,7 +10,7 @@ const bulbService = {
 
     return response.data.data;
   },
-  updateBulb: async (id: string, state: "ON" | "OFF"): Promise<IBulb> => {
+  updateBulb: async (id: string, state: "ON" | "OFF"): Promise<IBulb[]> => {
     const response = await axios.patch(
       SERVER_URL + `/api/bulbs/${id}/${state}`,
       {}

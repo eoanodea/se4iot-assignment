@@ -61,7 +61,6 @@ client.on("message", function (topic, message) {
 setInterval(function () {
   checkMQTTStatus();
 }, 5 * 60 * 1000);
-// }, 3000);
 
 function checkMQTTStatus() {
   console.log("Checking MQTT topic...");
@@ -72,15 +71,30 @@ function checkMQTTStatus() {
   client.publish("house/command", JSON.stringify(data));
 }
 
-app.get("/api/bulbs", (req, res) => {
+function getBulbs() {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(() => {
+      if (bulbs.length > 0) {
+        clearInterval(interval);
+        resolve(bulbs);
+      }
+    }, 1000);
+  });
+}
+
+app.get("/api/bulbs", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   checkMQTTStatus();
-  setTimeout(function () {
-    res.json({ data: bulbs });
-  }, 500);
+  try {
+    const data = await getBulbs();
+    res.json({ data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.patch("/api/bulbs/:id/:state", (req, res) => {
+app.patch("/api/bulbs/:id/:state", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
   const { id, state } = req.params;
   console.log("request", id, state);
   const data = { command: state, ID: id };
@@ -88,12 +102,15 @@ app.patch("/api/bulbs/:id/:state", (req, res) => {
   console.log("data!", data);
   client.publish("house/command", JSON.stringify(data));
 
+  try {
+    const data = await getBulbs();
+    res.json({ data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
   // setTimeout(function () {
-  // checkMQTTStatus();
-  setTimeout(function () {
-    res.json({ data: bulbs });
-    // }, 500);
-  }, 500);
+  //   res.json({ data: bulbs });
+  // }, 500);
 });
 
 // Allow requests from any origin

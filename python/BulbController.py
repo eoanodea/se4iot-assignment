@@ -20,9 +20,10 @@ class BulbController:
 
     def __init__(self, broadcast_space, broker_address, broker_port) -> None:
         super().__init__()
+        self.loop = asyncio.get_event_loop()
         self._bulbs = []
         self._broadcast_space = broadcast_space
-        print('here is port', broker_port)
+
         self._client = mqtt.Client("BulbController")
         self._client.connect(broker_address, int(broker_port), 60)
 
@@ -51,17 +52,11 @@ class BulbController:
 
             if parsed_json is not None and 'command' in parsed_json:
                 if parsed_json['command'] == 'STATUS':
-                    asyncio.run(self.publish_status())
+                    self.loop.run_until_complete(self.publish_status())
 
                 elif parsed_json['command'] == 'ON' or parsed_json['command'] == 'OFF':
                     if 'ID' in parsed_json:
-                        # asyncio.new_event_loop(self.update_bulb_state(parsed_json['ID'], parsed_json['command']))
-                        loop = asyncio.new_event_loop()  # create a new event loop
-                        asyncio.set_event_loop(loop)  # set the new event loop as the current event loop
-                        try:
-                            asyncio.run(self.update_bulb_state(parsed_json['ID'], parsed_json['command']))
-                        finally:
-                            loop.close()  # close the new event loop
+                        self.loop.run_until_complete(self.update_bulb_state(parsed_json['ID'], parsed_json['command']))
                     else:
                         raise Exception("Command must include an ID for the bulb")
                 else:
@@ -75,8 +70,6 @@ class BulbController:
             self._client.publish("house/message", err.__str__())
 
     async def publish_status(self):
-        self._client.publish("house/status", "BUSY")
-
         bulbs = await self.discover_bulbs()
         if len(bulbs) == 0:
             self._client.publish("house/status", "READY")
@@ -103,17 +96,17 @@ class BulbController:
             bulb = self._bulbs[index]
 
             if state == "ON":
-                config = PilotBuilder(brightness=255, warm_white=255)
-                await bulb.turn_on(config)
-                json_data = bulb.build_data()
-                self._client.publish("house/bulb/" + str(index), json_data)
+                try:
+                    config = PilotBuilder(brightness=255, warm_white=255)
+                    await bulb.turn_on(config)
+                    json_data = bulb.build_data()
+                    self._client.publish("house/bulb/" + str(index), json_data)
+                except Exception as err:
+                    print("error turning on bulb controller")
             else:
                 await bulb.turn_off()
                 json_data = bulb.build_data()
                 self._client.publish("house/bulb/" + str(index), json_data)
-
-            # json_data = bulb.build_data()
-            # self._client.publish("house/bulb/" + str(index), json_data)
 
         except Exception as err:
             print("could not update bulb state")
@@ -128,26 +121,5 @@ class BulbController:
             file = open('mock-data.json')
             data = json.load(file)
 
-            
-
             bulbs = data
         return bulbs
-
-    # async def turn_on_bulb(self, ip_address):
-    #     light = wizlight(ip_address)
-
-    #     try:
-    #         await light.turn_on(PilotBuilder(brightness=255, warm_white=255))
-    #         return True;
-    #     except Exception as err:
-    #         print("Error turning on bulb" + err)
-    #         return False;
-
-    # async def turn_off_bulb(self, ip_address):
-    #     light = wizlight(ip_address)
-    #     try:
-    #         await light.turn_off()
-    #         return True;
-    #     except Exception as err:
-    #         print("Error turning off bulb" + err)
-    #         return False

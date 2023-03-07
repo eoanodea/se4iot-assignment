@@ -37,12 +37,9 @@ const Bulb = ({ bulb, updateState }: IBulbProps) => {
   };
 
   useEffect(() => {
-    const bulbIsOn = bulb.state === "ON";
-    if (loading && isOn !== bulbIsOn) {
-      setIsOn(bulbIsOn);
-      setLoading(false);
-    }
-  }, [bulb, isOn, loading]);
+    setIsOn(bulb.state === "ON");
+    setLoading(false);
+  }, [bulb]);
 
   return (
     <Grid item xs={12} md={4}>
@@ -53,6 +50,7 @@ const Bulb = ({ bulb, updateState }: IBulbProps) => {
             <FormControlLabel
               control={<Switch value={isOn} onChange={handleSwitch} />}
               label={isOn ? "ON" : "OFF"}
+              disabled={loading}
             />
           </FormGroup>
         </StyledCardActions>
