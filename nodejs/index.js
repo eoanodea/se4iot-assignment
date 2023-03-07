@@ -43,15 +43,18 @@ let bulbs = [];
 // Process MQTT messages
 client.on("message", function (topic, message) {
   const value = message.toString();
-  const jsonData = JSON.parse(value);
+  console.log("message check me for crash data", value);
+  if (value) {
+    const jsonData = JSON.parse(value);
 
-  bulbs.push(jsonData);
+    bulbs.push(jsonData);
 
-  const point = new Point("bulb")
-    .tag("bulb_ip", jsonData.ip)
-    .stringField("state", jsonData.state);
+    const point = new Point("bulb")
+      .tag("bulb_ip", jsonData.ip)
+      .stringField("state", jsonData.state);
 
-  writeApi.writePoint(point);
+    writeApi.writePoint(point);
+  }
 });
 
 // Check MQTT topic every 5 minutes
@@ -88,7 +91,7 @@ app.patch("/api/bulbs/:id/:state", (req, res) => {
   // setTimeout(function () {
   // checkMQTTStatus();
   setTimeout(function () {
-    res.json({ data: bulbs[id] });
+    res.json({ data: bulbs });
     // }, 500);
   }, 500);
 });

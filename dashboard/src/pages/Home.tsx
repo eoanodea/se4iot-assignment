@@ -11,22 +11,51 @@ const Home = () => {
   const [bulbs, setBulbs] = useState<IBulb[]>([]);
 
   useEffect(() => {
-    bulbService.getAll().then((data) => {
-      if (data) {
-        setBulbs(data);
-        setLoading(false);
-      } else {
+    bulbService
+      .getAll()
+      .then((data) => {
+        if (data) {
+          setBulbs(data);
+          setLoading(false);
+        } else {
+          setError("Error: Could not fetch data");
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
         setError("Error: Could not fetch data");
-      }
-    });
+        setLoading(false);
+      });
   }, []);
+
+  const updateState = (id: string, state: "ON" | "OFF") => {
+    bulbService
+      .updateBulb(id, state)
+      .then((data) => {
+        if (data) {
+          console.log("success");
+          setBulbs([...bulbs, data]);
+          // setLoading(false);
+        } else {
+          console.log("server issue");
+
+          // setError("Error: Could not fetch data");
+          // setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log("another issue", err);
+        // setError("Error: Could not fetch data");
+        // setLoading(false);
+      });
+  };
 
   if (loading) return <Loading />;
   if (error) return <EmptyState message={error} />;
 
   return (
     <>
-      <ListBulbs bulbs={bulbs} />
+      <ListBulbs bulbs={bulbs} updateState={updateState} />
     </>
   );
 };

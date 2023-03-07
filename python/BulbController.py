@@ -128,7 +128,7 @@ class BulbController:
             file = open('mock-data.json')
             data = json.load(file)
 
-            print(data)
+            
 
             bulbs = data
         return bulbs
