@@ -7,8 +7,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { useState, useEffect } from "react";
-import { Bar, Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import { DataPoint } from "../interfaces";
 import moment from "moment";
 import { Typography } from "@mui/material";
@@ -22,19 +21,6 @@ ChartJS.register(
   Legend
 );
 
-const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "top" as const,
-    },
-    title: {
-      display: true,
-      text: "Chart.js Line Chart",
-    },
-  },
-};
-
 const colours = [
   "rgba(9, 127, 155, 0.5)",
   "rgba(232, 106, 214, 0.5)",
@@ -45,13 +31,6 @@ const colours = [
 
 interface IGraph {
   influxData: DataPoint[];
-}
-
-interface IData {
-  label: string;
-  data: { x: Date; y: string }[];
-  borderColor: string;
-  backgroundColor: string;
 }
 
 const Graph = ({ influxData }: IGraph) => {
