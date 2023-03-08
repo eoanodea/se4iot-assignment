@@ -22,10 +22,11 @@ function App() {
         component="main"
         style={{ marginTop: "40px", marginBottom: "40px", minHeight: "60vh" }}
         justifyContent="space-evenly"
+        spacing={6}
       >
-        <Grid item xs={11}>
-          <Home />
-        </Grid>
+        {/* <Grid item xs={11}> */}
+        <Home />
+        {/* </Grid> */}
       </Grid>
     </ThemeProvider>
   );

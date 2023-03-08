@@ -17,12 +17,13 @@ def main():
     write_api = client.write_api(write_options=SYNCHRONOUS)
 
     # Define the data
-    bulb_ip = "192.168.159.102"
+    bulb_ips = ["192.168.159.102", "192.168.159.103", "192.168.159.104", "192.168.159.105"]
+    bulb_ip = random.choice(bulb_ips)
     # timestamp = datetime.utcnow()
     now = datetime.utcnow()
     for i in range(50):
         # Randomly set the state to either "ON" or "OFF"
-        state = random.choice(["ON", "OFF"])
+        state = random.choice(["ON"])
 
         timestamp = now - timedelta(minutes=i * 5)
         # Create a new point with a timestamp that is 5 minutes apart

@@ -1,16 +1,28 @@
+import { Grid } from "@mui/material";
 import { useState, useEffect } from "react";
 import EmptyState from "../components/EmptyState";
+import Graph from "../components/Graph";
 import ListBulbs from "../components/ListBulbs";
 import Loading from "../components/Loading";
-import { IBulb } from "../interfaces";
+import { DataPoint, IBulb } from "../interfaces";
 import bulbService from "../services/bulbService";
+import graphService from "../services/graphService";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [bulbs, setBulbs] = useState<IBulb[]>([]);
+  const [graphData, setGraphData] = useState<DataPoint[]>([]);
 
   useEffect(() => {
+    graphService
+      .getData()
+      .then((data) => {
+        setGraphData(data.data);
+      })
+      .catch((err) => {
+        console.log("Could not fetch graph data");
+      });
     bulbService
       .getAll()
       .then((data) => {
@@ -54,7 +66,12 @@ const Home = () => {
 
   return (
     <>
-      <ListBulbs bulbs={bulbs} updateState={updateState} />
+      <Grid item md={6}>
+        {graphData.length > 0 && <Graph influxData={graphData} />}
+      </Grid>
+      <Grid item md={6}>
+        <ListBulbs bulbs={bulbs} updateState={updateState} />
+      </Grid>
     </>
   );
 };

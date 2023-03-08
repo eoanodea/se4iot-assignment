@@ -17,6 +17,7 @@ const token = process.env.INFLUXDB_TOKEN;
 const influx = new InfluxDB({ url: influxHost, token });
 
 const writeApi = influx.getWriteApi(org, bucket);
+const queryApi = influx.getQueryApi(org, bucket);
 
 const express = require("express");
 const app = express();
@@ -81,6 +82,33 @@ function getBulbs() {
     }, 1000);
   });
 }
+
+app.get("/api/graph", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  const query = `from(bucket:"bulbs")
+  |> range(start: 0)
+  |> filter(fn: (r) => true)`;
+
+  let data = [];
+  const observer = {
+    next(row, tableMeta) {
+      const o = tableMeta.toObject(row);
+
+      data.push(o);
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished ERROR");
+      res.json(500);
+    },
+    complete() {
+      console.log("\nFinished SUCCESS");
+      res.json({ data });
+    },
+  };
+
+  queryApi.queryRows(query, observer);
+});
 
 app.get("/api/bulbs", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
